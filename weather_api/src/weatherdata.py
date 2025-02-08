@@ -12,11 +12,15 @@ class WeatherAPIError(Exception):
 
 def _get_data(location: str, date1: str, date2: str) -> dict[str, str]:
     if api_token := getenv("API_TOKEN"):
-        return requests.get(
+        response = requests.get(
             _URL.format(
                 location=location, date1=date1, date2=date2, API_TOKEN=api_token
             )
-        ).json()
+        )
+
+        if response.status_code != 200:
+            raise WeatherAPIError("Coudn't read data from endpoint")
+        return response.json()
     raise WeatherAPIError("No api key found, please set API_TOKEN")
 
 
